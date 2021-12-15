@@ -26,6 +26,21 @@ class Nsapi{
         else{
             this.API_URL = `/app/site/hosting/restlet.nl?script=customscript_js_client_api_wrapper&deploy=customdeploy_client_api_wrap`
         }
+
+        this.query = {
+            runSuiteQL: (args) =>{
+                return this.makeRequest({endpoint: "query.runSuiteQL", args})
+            }
+        }
+    
+        // Args - should be provided a type and values object.
+        this.record = {
+            create: (args) =>{
+                return this.makeRequest({endpoint: "record.create", args}) 
+            }
+        }
+
+
     }
 
     getAuthHeaderForRequest(request) {
@@ -81,18 +96,7 @@ class Nsapi{
 
     }
 
-    query = {
-        runSuiteQL: (args) =>{
-            return this.makeRequest({endpoint: "query.runSuiteQL", args})
-        }
-    }
 
-    // Args - should be provided a type and values object.
-    record = {
-        create: (args) =>{
-            return this.makeRequest({endpoint: "record.create", args}) 
-        }
-    }
 }
 
 module.exports = Nsapi
