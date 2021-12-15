@@ -1,0 +1,14 @@
+<restlet scriptid="customscript_js_client_api_wrapper">
+    <isinactive></isinactive>
+    <name>JS Client API Wrapper</name>
+    <notifyowner>T</notifyowner>
+    <scriptfile>[/SuiteScripts/SuiteScript API/js_client_api_wrapper.js]</scriptfile>
+    <scriptdeployments>
+        <scriptdeployment scriptid="customdeploy_client_api_wrap">
+            <isdeployed>T</isdeployed>
+            <loglevel>DEBUG</loglevel>
+            <status>RELEASED</status>
+            <title>JS Client API Wrapper</title>
+        </scriptdeployment>
+    </scriptdeployments>
+</restlet>
