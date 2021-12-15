@@ -95,4 +95,4 @@ class Nsapi{
     }
 }
 
-module.exports = Nsapi
+export default Nsapi
