@@ -81,14 +81,14 @@ class Nsapi{
 
     }
 
-    static query = {
+    query = {
         runSuiteQL: (args) =>{
             return this.makeRequest({endpoint: "query.runSuiteQL", args})
         }
     }
 
     // Args - should be provided a type and values object.
-    static record = {
+    record = {
         create: (args) =>{
             return this.makeRequest({endpoint: "record.create", args}) 
         }
