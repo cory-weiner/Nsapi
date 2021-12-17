@@ -40,6 +40,12 @@ class Nsapi{
             }
         }
 
+        this.runtime = {
+            getCurrentUser: () =>{
+                return this.makeRequest({endpoint: "runtime.getCurrentUser"}) 
+            }
+        }
+
 
     }
 
