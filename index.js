@@ -83,19 +83,22 @@ class Nsapi{
     
     makeRequest({endpoint, args}){
         let file_promises = []
+        console.log(args)
         if (args.values){
-            args.values.forEach(v=>{
+            Object.entries(args.values).forEach((k,v)=>{
                 if (typeof v == 'object' && v.type == 'file'){
                     let file_process_promise = this.fileToBase64(v.value).then(base64_data=>{
-                        v.value = base64_data.slice(base64_data.indexOf(",")+1)
+                        args.values[k].value = base64_data.slice(base64_data.indexOf(",")+1)
                     })
                     file_promises.push(file_process_promise)
                 }
             })
         }
 
+    
         
         return Promise.all(file_promises).then(all_promises=>{
+            
             var config = {
                 method: 'POST',
                 url: this.API_URL,
@@ -113,6 +116,8 @@ class Nsapi{
                   endpoint,
                   args
               }
+
+              console.log(config)
         
               return axios(config)
               .then(function (response) {
