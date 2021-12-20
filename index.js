@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const oauth1a = require('oauth-1.0a');
 const axios = require('axios')
 const Compress = require('compress.js')
-const compress = new Compress()
+const compress = new Compress.default()
 
 class Nsapi{
     constructor({
