@@ -15,6 +15,8 @@ class Nsapi{
         TOKENSECRET,
         REALM
     }) {
+
+        ENVIRONMENT
         
         this.CONSUMERKEY = CONSUMERKEY
         this.CONSUMERSECRET = CONSUMERSECRET
@@ -87,9 +89,10 @@ class Nsapi{
     fileToBase64(file, compressionoptions=undefined){
         if(compressionoptions){
              return compress.compress([file], compressionoptions).then(result=>{
+                 console.log("got the result in lib", result)
                  return {
-                     value: result.data,
-                     fileType: this.fileEncodeTypes[result.prefix]
+                     value: result[0].data,
+                     fileType: this.fileEncodeTypes[result[0].prefix]
                  }
              })  
         }
