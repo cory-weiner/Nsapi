@@ -86,7 +86,7 @@ class Nsapi{
 
     fileToBase64(file, compressionoptions=undefined){
         if(compressionoptions){
-             return compress.compress(file, compressionoptions).then(result=>{
+             return compress.compress([file], compressionoptions).then(result=>{
                  return {
                      value: result.data,
                      fileType: this.fileEncodeTypes[result.prefix]
