@@ -79,7 +79,7 @@ class Nsapi{
           reader.onload = () => resolve(reader.result);
           reader.onerror = error => reject(error);
       })
-    },
+    }
     
     makeRequest({endpoint, args}){
         let file_promises = []
