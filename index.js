@@ -3,6 +3,8 @@
 const crypto = require('crypto');
 const oauth1a = require('oauth-1.0a');
 const axios = require('axios')
+const Compress = require('compress.js')
+const compress = new Compress()
 
 class Nsapi{
     constructor({
@@ -82,8 +84,12 @@ class Nsapi{
     }
 
 
-    fileToBase64(file){
+    fileToBase64(file, compressionoptions=undefined){
+        if(compressionoptions){
+
+        }
         return new Promise((resolve, reject) => {
+
           const reader = new FileReader();
           reader.readAsDataURL(file);
           reader.onload = () => resolve(
