@@ -49,13 +49,13 @@ class Nsapi{
         }
 
         this.fileEncodeTypes =  {
-            "data:image/png;base64": "PNGIMAGE",
-            "data:text/csv;base64": "CSV",
-            "data:application/vnd.ms-excel;base64": "EXCEL",
-            "data:application/pdf;base64": "PDF",
-            "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64": "WORD",
-            "data:image/jpeg;base64": "JPGIMAGE",
-            "data:text/plain;base64": "PLAINTEXT"
+            "data:image/png;base64,": "PNGIMAGE",
+            "data:text/csv;base64,": "CSV",
+            "data:application/vnd.ms-excel;base64,": "EXCEL",
+            "data:application/pdf;base64,": "PDF",
+            "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,": "WORD",
+            "data:image/jpeg;base64,": "JPGIMAGE",
+            "data:text/plain;base64,": "PLAINTEXT"
         }
 
 
@@ -86,7 +86,12 @@ class Nsapi{
 
     fileToBase64(file, compressionoptions=undefined){
         if(compressionoptions){
-
+             return compress.compress(file, compressionoptions).then(result=>{
+                 return {
+                     value: result.data,
+                     fileType: this.fileEncodeTypes[result.prefix]
+                 }
+             })  
         }
         return new Promise((resolve, reject) => {
 
@@ -95,7 +100,7 @@ class Nsapi{
           reader.onload = () => resolve(
             {
                 value: reader.result.slice(reader.result.indexOf(",")+1),
-                fileType: this.fileEncodeTypes[reader.result.slice(0,reader.result.indexOf(","))]
+                fileType: this.fileEncodeTypes[reader.result.slice(0,reader.result.indexOf(",")+1)]
             }
             );
           reader.onerror = error => reject(error);
