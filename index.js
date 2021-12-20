@@ -67,38 +67,61 @@ class Nsapi{
             key: this.TOKENKEY,
             secret: this.TOKENSECRET,
         });
+
         return oauth.toHeader(authorization);
     }
 
-    makeRequest({endpoint, args}){
 
-        var config = {
-            method: 'POST',
-            url: this.API_URL,
-            headers: { 
-              'Content-Type': 'application/json', 
-            }
-          };
-          
-          if (this.TOKENKEY){
-            config.headers.Authorization = this.getAuthHeaderForRequest(config).Authorization
-          }
-          
-
-          config.data = {
-              endpoint,
-              args
-          }
+    fileToBase64(file){
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+      })
+    },
     
-          return axios(config)
-          .then(function (response) {
+    makeRequest({endpoint, args}){
+        let file_promises = []
+        args.values.forEach(v=>{
+            if (typeof v == 'object' && v.type == 'file'){
+                let file_process_promise = this.fileToBase64(v.value).then(base64_data=>{
+                    v.value = base64_data.slice(base64_data.indexOf(",")+1)
+                })
+                file_promises.push(file_process_promise)
+            }
+        })
         
+        return Promise.all(file_promises).then(all_promises=>{
+            var config = {
+                method: 'POST',
+                url: this.API_URL,
+                headers: { 
+                  'Content-Type': 'application/json', 
+                }
+              };
+              
+              if (this.TOKENKEY){
+                config.headers.Authorization = this.getAuthHeaderForRequest(config).Authorization
+              }
+              
+    
+              config.data = {
+                  endpoint,
+                  args
+              }
         
-            return response.data
-          })
-          .catch(function (error) {
-            console.log(error.response.data.error);
-          });
+              return axios(config)
+              .then(function (response) {
+            
+            
+                return response.data
+              })
+              .catch(function (error) {
+                console.log(error.response.data.error);
+              });
+    
+        })
 
     }
 
