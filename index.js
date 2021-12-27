@@ -41,6 +41,9 @@ class Nsapi{
         this.record = {
             create: (args) =>{
                 return this.makeRequest({endpoint: "record.create", args}) 
+            },
+            submitFields: (args)=>{
+                return this.makeRequest({endpoint: "record.submitFields", args}) 
             }
         }
 
