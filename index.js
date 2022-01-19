@@ -44,6 +44,9 @@ class Nsapi{
             },
             submitFields: (args)=>{
                 return this.makeRequest({endpoint: "record.submitFields", args}) 
+            },
+            delete: (args)=>{
+                return this.makeRequest({endpoint: "record.delete", args}) 
             }
         }
 
