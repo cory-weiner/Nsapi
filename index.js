@@ -32,8 +32,20 @@ class Nsapi{
         }
 
         this.query = {
-            runSuiteQL: (args) =>{
+            runSuiteQL: (args) => {
                 return this.makeRequest({endpoint: "query.runSuiteQL", args})
+            }
+        }
+
+        this.https = {
+            get : (args) => {
+                return this.makeRequest({endpoint: "https.get", args})
+            },
+            post : (args) => {
+                return this.makeRequest({endpoint: "https.post", args})
+            },
+            put : (args) => {
+                return this.makeRequest({endpoint: "https.put", args})
             }
         }
     
@@ -55,6 +67,7 @@ class Nsapi{
                 return this.makeRequest({endpoint: "runtime.getCurrentUser"}) 
             }
         }
+
 
         this.fileEncodeTypes =  {
             "data:image/png;base64,": "PNGIMAGE",
@@ -115,6 +128,7 @@ class Nsapi{
           reader.onerror = error => reject(error);
       })
     }
+
     
     makeRequest({endpoint, args}){
         console.log("got to makeRequest", args)
@@ -141,8 +155,6 @@ class Nsapi{
         
               return axios(config)
               .then(function (response) {
-            
-            
                 return response.data
               })
               .catch(function (error) {
