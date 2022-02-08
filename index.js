@@ -67,6 +67,11 @@ class Nsapi{
                 return this.makeRequest({endpoint: "runtime.getCurrentUser"}) 
             }
         }
+        this.search = {
+            create: (args) =>{
+                return this.makeRequest({endpoint: "search.create", args}) 
+            }
+        }
 
 
         this.fileEncodeTypes =  {
@@ -159,6 +164,7 @@ class Nsapi{
               })
               .catch(function (error) {
                 console.log(error.response.data.error);
+                return error
               });
     
      
