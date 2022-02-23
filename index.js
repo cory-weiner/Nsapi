@@ -17,7 +17,7 @@ class Nsapi{
     }) {
 
         ENVIRONMENT
-        
+        this.batch = false
         this.CONSUMERKEY = CONSUMERKEY
         this.CONSUMERSECRET = CONSUMERSECRET
         this.TOKENKEY = TOKENKEY
@@ -164,7 +164,8 @@ class Nsapi{
               })
               .catch(function (error) {
                 console.log(error.response.data.error);
-                return error
+                throw error
+                // return error
               });
     
      
