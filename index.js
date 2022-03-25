@@ -70,6 +70,9 @@ class Nsapi{
         this.search = {
             create: (args) =>{
                 return this.makeRequest({endpoint: "search.create", args}) 
+            },
+            load: (args) =>{
+                return this.makeRequest({endpoint: "search.load", args}) 
             }
         }
 
