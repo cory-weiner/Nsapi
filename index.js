@@ -98,9 +98,9 @@ class Nsapi{
         }
 
         this.runtime = {
-            getCurrentUser: () =>{
+            getCurrentUser: (args) =>{
                 let req = {endpoint: "runtime.getCurrentUser"}
-                if(args.batch){
+                if(args && args.batch){
                     return req
                 }
                 return this.makeRequest(req) 
