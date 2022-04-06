@@ -33,46 +33,93 @@ class Nsapi{
 
         this.query = {
             runSuiteQL: (args) => {
-                return this.makeRequest({endpoint: "query.runSuiteQL", args})
+                let req = {endpoint: "query.runSuiteQL", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req)
+            },
+            
+        }
+
+        this.batch = {
+            run: (requests) =>{
+                this.makeRequest({batch:requests})
             }
         }
 
         this.https = {
             get : (args) => {
-                return this.makeRequest({endpoint: "https.get", args})
+                let req = {endpoint: "https.get", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req)
             },
             post : (args) => {
-                return this.makeRequest({endpoint: "https.post", args})
+                let req = {endpoint: "https.post", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req)
             },
             put : (args) => {
-                return this.makeRequest({endpoint: "https.put", args})
+                let req = {endpoint: "https.put", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req)
             }
         }
     
         // Args - should be provided a type and values object.
         this.record = {
             create: (args) =>{
-                return this.makeRequest({endpoint: "record.create", args}) 
+                let req = {endpoint: "record.create", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             },
             submitFields: (args)=>{
-                return this.makeRequest({endpoint: "record.submitFields", args}) 
+                let req = {endpoint: "record.submitFields", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             },
             delete: (args)=>{
-                return this.makeRequest({endpoint: "record.delete", args}) 
+                let req = {endpoint: "record.delete", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             }
         }
 
         this.runtime = {
             getCurrentUser: () =>{
-                return this.makeRequest({endpoint: "runtime.getCurrentUser"}) 
+                let req = {endpoint: "runtime.getCurrentUser"}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             }
         }
         this.search = {
             create: (args) =>{
-                return this.makeRequest({endpoint: "search.create", args}) 
+                let req = {endpoint: "search.create", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             },
             load: (args) =>{
-                return this.makeRequest({endpoint: "search.load", args}) 
+                let req = {endpoint: "search.load", args}
+                if(args.batch){
+                    return req
+                }
+                return this.makeRequest(req) 
             }
         }
 
@@ -138,7 +185,7 @@ class Nsapi{
     }
 
     
-    makeRequest({endpoint, args}){
+    makeRequest({endpoint, args, batch}){
         console.log("got to makeRequest", args)
             
             var config = {
@@ -153,11 +200,18 @@ class Nsapi{
                 config.headers.Authorization = this.getAuthHeaderForRequest(config).Authorization
               }
               
-    
-              config.data = {
-                  endpoint,
-                  args
+              if (batch){
+                  config.data = {
+                      batch
+                  }
               }
+              else{
+                config.data = {
+                    endpoint,
+                    args
+                }
+              }
+              
 
               console.log(config)
         
