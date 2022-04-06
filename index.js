@@ -44,7 +44,7 @@ class Nsapi{
 
         this.batch = {
             run: (requests) =>{
-                this.makeRequest({batch:requests})
+                return this.makeRequest({batch:requests})
             }
         }
 
