@@ -34,7 +34,7 @@ class Nsapi{
         this.query = {
             runSuiteQL: (args) => {
                 let req = {endpoint: "query.runSuiteQL", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req)
@@ -51,21 +51,21 @@ class Nsapi{
         this.https = {
             get : (args) => {
                 let req = {endpoint: "https.get", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req)
             },
             post : (args) => {
                 let req = {endpoint: "https.post", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req)
             },
             put : (args) => {
                 let req = {endpoint: "https.put", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req)
@@ -76,21 +76,21 @@ class Nsapi{
         this.record = {
             create: (args) =>{
                 let req = {endpoint: "record.create", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
             },
             submitFields: (args)=>{
                 let req = {endpoint: "record.submitFields", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
             },
             delete: (args)=>{
                 let req = {endpoint: "record.delete", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
@@ -100,7 +100,7 @@ class Nsapi{
         this.runtime = {
             getCurrentUser: (args) =>{
                 let req = {endpoint: "runtime.getCurrentUser"}
-                if(args && args.batch){
+                if(args && args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
@@ -109,14 +109,14 @@ class Nsapi{
         this.search = {
             create: (args) =>{
                 let req = {endpoint: "search.create", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
             },
             load: (args) =>{
                 let req = {endpoint: "search.load", args}
-                if(args.batch){
+                if(args.batchid){
                     return req
                 }
                 return this.makeRequest(req) 
