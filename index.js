@@ -42,6 +42,16 @@ class Nsapi{
             
         }
 
+        this.task = {
+            create: (args) => {
+                let req = {endpoint: "task.create", args}
+                if(args.batchid){
+                    return req
+                }
+                return this.makeRequest(req)
+            }
+        }
+
         this.batch = {
             run: (requests) =>{
                 return this.makeRequest({batch:requests})
