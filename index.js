@@ -142,7 +142,7 @@ class Nsapi {
             "data:text/plain;base64,": "PLAINTEXT"
         }
 
-        this.getAuthToken(request)=> {
+        this.getAuthToken = (request) => {
             return this.getAuthHeaderForRequest(request)
         }
 
