@@ -4,6 +4,14 @@ const axios = require('axios')
 const Compress = require('compress.js')
 const compress = new Compress.default()
 
+
+const api = axios.create({})
+// Rate limit requests from axios on dev environment
+const MAX_REQUESTS_COUNT = 3
+const INTERVAL_MS = 500
+let PENDING_REQUESTS = 0
+
+
 class Nsapi {
     constructor({
         ENVIRONMENT,
@@ -22,6 +30,33 @@ class Nsapi {
         this.TOKENSECRET = TOKENSECRET
         this.REALM = REALM
         if (REALM) {
+            // Axios request interceptor - throttles request on dev environment
+            api.interceptors.request.use(function (config) {
+
+                return new Promise((resolve, reject) => {
+                    let interval = setInterval(() => {
+                        if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
+                            PENDING_REQUESTS++
+                            clearInterval(interval)
+                            resolve(config)
+                        }
+                        else {
+                            console.log("Hit maximum concurrency - delaying request")
+                        }
+                    }, INTERVAL_MS)
+                })
+            })
+            /**
+             * Axios Response Interceptor
+             */
+            api.interceptors.response.use(function (response) {
+
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.resolve(response)
+            }, function (error) {
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.reject(error)
+            })
 
             this.API_URL = `https://${REALM.toString().replace('_SB', '-sb')}.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=customscript_js_client_api_wrapper&deploy=customdeploy_client_api_wrap`
         }
