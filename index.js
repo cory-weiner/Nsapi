@@ -264,7 +264,7 @@ class Nsapi {
         console.log(config)
 
         return new Promise((resolve, reject) => {
-            return axios(config).then(function (response) {
+            return api(config).then(function (response) {
                 console.log("response")
                 resolve(response.data)
             }).catch(error => {
