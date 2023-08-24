@@ -4,6 +4,16 @@ const axios = require('axios')
 const Compress = require('compress.js')
 const compress = new Compress.default()
 
+// DO NOT CHANGE ON FIELD APP -- NEED TO IMPLEMENT PROXY!
+
+
+const api = axios.create({})
+// Rate limit requests from axios on dev environment
+const MAX_REQUESTS_COUNT = 3
+const INTERVAL_MS = 500
+let PENDING_REQUESTS = 0
+
+
 class Nsapi {
     constructor({
         ENVIRONMENT,
@@ -11,9 +21,7 @@ class Nsapi {
         CONSUMERSECRET,
         TOKENKEY,
         TOKENSECRET,
-        REALM,
-        PROXY,
-        PROXY_DEFAULT
+        REALM
     }) {
 
         ENVIRONMENT
@@ -23,9 +31,34 @@ class Nsapi {
         this.TOKENKEY = TOKENKEY
         this.TOKENSECRET = TOKENSECRET
         this.REALM = REALM
-        this.PROXY = PROXY
-        this.PROXY_DEFAULT = PROXY_DEFAULT
         if (REALM) {
+            // Axios request interceptor - throttles request on dev environment
+            api.interceptors.request.use(function (config) {
+
+                return new Promise((resolve, reject) => {
+                    let interval = setInterval(() => {
+                        if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
+                            PENDING_REQUESTS++
+                            clearInterval(interval)
+                            resolve(config)
+                        }
+                        else {
+                            console.log("Hit maximum concurrency - delaying request")
+                        }
+                    }, INTERVAL_MS)
+                })
+            })
+            /**
+             * Axios Response Interceptor
+             */
+            api.interceptors.response.use(function (response) {
+
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.resolve(response)
+            }, function (error) {
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.reject(error)
+            })
 
             this.API_URL = `https://${REALM.toString().replace('_SB', '-sb')}.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=customscript_js_client_api_wrapper&deploy=customdeploy_client_api_wrap`
         }
@@ -84,17 +117,6 @@ class Nsapi {
             }
         }
 
-        this.proxy = (args) => {
-            let req = { endpoint: "proxy", args }
-            if (args.batchid) {
-                return req
-            }
-            return this.makeRequest(req)
-        }
-
-        this.get = (url) => {
-            this.makeRequest({ url })
-        }
         // Args - should be provided a type and values object.
         this.record = {
             create: (args) => {
@@ -216,16 +238,9 @@ class Nsapi {
     makeRequest({ endpoint, args, batch }) {
         console.log("got to makeRequest", args)
 
-        let target_url = this.API_URL
-        let USE_PROXY = (!this.REALM && this.PROXY && (this.PROXY_DEFAULT || args.proxy))
-        if (USE_PROXY) {
-            target_url = this.PROXY
-            console.log("USING PROXY", target_url)
-        }
-
         var config = {
             method: 'POST',
-            url: target_url,
+            url: this.API_URL,
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -248,29 +263,14 @@ class Nsapi {
         }
 
 
-
         console.log(config)
 
         return new Promise((resolve, reject) => {
-            return axios(config).then(function (response) {
+            return api(config).then(function (response) {
                 console.log("response")
-                if (USE_PROXY) {
-                    try {
-                        let parsed_response = JSON.parse(response.data)
-                        resolve(parsed_response)
-                    }
-                    catch (err) {
-                        resolve(response.data)
-                    }
-
-                }
-                else {
-                    resolve(response.data)
-                }
-
+                resolve(response.data)
             }).catch(error => {
-                console.log("the error!", error)
-
+                console.log(error)
                 reject(error.response)
             })
         })
