@@ -4,6 +4,14 @@ const axios = require('axios')
 const Compress = require('compress.js')
 const compress = new Compress.default()
 
+
+const api = axios.create({})
+// Rate limit requests from axios on dev environment
+const MAX_REQUESTS_COUNT = 3
+const INTERVAL_MS = 500
+let PENDING_REQUESTS = 0
+window.errors = []
+
 class Nsapi {
     constructor({
         ENVIRONMENT,
@@ -26,6 +34,34 @@ class Nsapi {
         this.PROXY = PROXY
         this.PROXY_DEFAULT = PROXY_DEFAULT
         if (REALM) {
+            // Axios request interceptor - throttles request on dev environment
+            api.interceptors.request.use(function (config) {
+
+                return new Promise((resolve, reject) => {
+                    let interval = setInterval(() => {
+                        if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
+                            PENDING_REQUESTS++
+                            clearInterval(interval)
+                            resolve(config)
+                        }
+                        else {
+                            // console.log("Hit maximum concurrency - delaying request")
+                        }
+                    }, INTERVAL_MS)
+                })
+            })
+            /**
+             * Axios Response Interceptor
+             */
+            api.interceptors.response.use(function (response) {
+
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.resolve(response)
+            }, function (error) {
+                PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+                return Promise.reject(error)
+            })
+
 
             this.API_URL = `https://${REALM.toString().replace('_SB', '-sb')}.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=customscript_js_client_api_wrapper&deploy=customdeploy_client_api_wrap`
         }
@@ -191,7 +227,7 @@ class Nsapi {
     fileToBase64(file, compressionoptions = undefined) {
         if (compressionoptions) {
             return compress.compress([file], compressionoptions).then(result => {
-                console.log("got the result in lib", result)
+                // console.log("got the result in lib", result)
                 return {
                     value: result[0].data,
                     fileType: this.fileEncodeTypes[result[0].prefix]
@@ -214,13 +250,16 @@ class Nsapi {
 
 
     makeRequest({ endpoint, args, batch }) {
-        console.log("got to makeRequest", args)
-
+        // console.log("got to makeRequest", args)
+        let proxy_bypass = false
+        if (args && args.proxy === false) {
+            proxy_bypass = true
+        }
         let target_url = this.API_URL
-        let USE_PROXY = (!this.REALM && this.PROXY && (this.PROXY_DEFAULT || args.proxy))
+        let USE_PROXY = (!this.REALM && this.PROXY && (this.PROXY_DEFAULT || args.proxy) && !proxy_bypass)
         if (USE_PROXY) {
             target_url = this.PROXY
-            console.log("USING PROXY", target_url)
+            // console.log("USING PROXY", target_url)
         }
 
         var config = {
@@ -249,11 +288,11 @@ class Nsapi {
 
 
 
-        console.log(config)
+        // console.log(config)
 
         return new Promise((resolve, reject) => {
-            return axios(config).then(function (response) {
-                console.log("response")
+            return api(config).then(function (response) {
+                // console.log("response")
                 if (USE_PROXY) {
                     try {
                         let parsed_response = JSON.parse(response.data)
@@ -269,8 +308,10 @@ class Nsapi {
                 }
 
             }).catch(error => {
-                console.log("the error!", error)
-
+                // console.log("the error!", error)
+                if (window.errors) {
+                    window.errors.push({ config: config, error: error })
+                }
                 reject(error.response)
             })
         })
