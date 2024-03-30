@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const CryptoJS = require("crypto-js");
 const oauth1a = require('oauth-1.0a');
 const axios = require('axios')
 const Compress = require('compress.js')
@@ -153,9 +153,24 @@ class Nsapi {
                     return req
                 }
                 return this.makeRequest(req)
+            },
+            transform: (args) => {
+                let req = { endpoint: "record.transform", args }
+                if (args.batchid) {
+                    return req
+                }
+                return this.makeRequest(req)
             }
         }
-
+        this.util = {
+            getSignedURL: (args) => {
+                let req = { endpoint: "util.getSignedURL", args }
+                if (args && args.batchid) {
+                    return req
+                }
+                return this.makeRequest(req)
+            }
+        }
         this.runtime = {
             getCurrentUser: (args) => {
                 let req = { endpoint: "runtime.getCurrentUser" }
@@ -208,10 +223,13 @@ class Nsapi {
             realm: this.REALM,
             signature_method: 'HMAC-SHA256',
             hash_function(base_string, key) {
-                return crypto
-                    .createHmac('sha256', key)
-                    .update(base_string)
-                    .digest('base64')
+                let signature = CryptoJS.HmacSHA256(base_string, key).toString(CryptoJS.enc.Base64)
+                console.log("DA SIGNATURE", signature)
+                return signature
+                // return crypto
+                //     .createHmac('sha256', key)
+                //     .update(base_string)
+                //     .digest('base64')
             },
         })
 
