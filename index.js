@@ -224,7 +224,7 @@ class Nsapi {
             signature_method: 'HMAC-SHA256',
             hash_function(base_string, key) {
                 let signature = CryptoJS.HmacSHA256(base_string, key).toString(CryptoJS.enc.Base64)
-                console.log("DA SIGNATURE", signature)
+       
                 return signature
                 // return crypto
                 //     .createHmac('sha256', key)
